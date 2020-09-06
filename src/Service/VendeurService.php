@@ -2,7 +2,11 @@
 
 namespace App\Service;
 
+use App\Entity\Article;
+use App\Entity\ArticleVendeur;
+use App\Entity\Etat;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\ORMException;
 use stdClass;
 
 class VendeurService
@@ -27,19 +31,49 @@ class VendeurService
     }
 
     /**
-     * Cacul selon stratégie :
-     * 
+     * Cacul selon stratégie
      */
-    public function calculerPrix($prixPlancher, $prixMemeEtat = [], $prixEtatSuperieur = []) {
+    public function calculerPrix(Article $article, Etat $etat, $prixPlancher, $prixMemeEtat = [], $prixEtatSuperieur = []) 
+    {
+        $prixDeVente = 0;
 
-        $retour = 0;
+        // Tri des tableaux des prix pour viser le moins cher des concurrents                
+        sort($prixMemeEtat);
+        sort($prixEtatSuperieur);
 
-        if (count($prixMemeEtat)) {
-
-        } elseif ($prixEtatSuperieur) {
-
+        foreach($prixMemeEtat as $prix) {
+            if ($prixPlancher <= floatval($prix) - 0.01 ) {                
+                $prixDeVente = floatval($prix) - 0.01;
+                break;
+            }   
+        }        
+        
+        if ($prixDeVente == 0) {
+            foreach($prixEtatSuperieur as $prix) {
+                if ($prixPlancher <= floatval($prix) - 1) {
+                    $prixDeVente = floatval($prix) - 1;
+                    break;
+                }   
+            }
         }
 
-        return $retour;
+        if ($prixDeVente > 0) {
+
+            // Enregistrer Article Vendeur
+            $articleVendeur = new ArticleVendeur();
+            $articleVendeur->setPlancher($prixPlancher);
+            $articleVendeur->setPrix($prixDeVente);
+            $articleVendeur->setArticle($article);
+            $articleVendeur->setEtat($etat);
+
+            try {
+                $this->em->persist($articleVendeur);
+                $this->em->flush();
+            } catch(ORMException $ex) {
+                
+            }
+        }
+
+        return $prixDeVente;
     }
 }

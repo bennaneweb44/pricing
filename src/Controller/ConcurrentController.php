@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Repository\ArticleConcurrentRepository;
+use App\Repository\ArticleRepository;
+use App\Repository\ArticleVendeurRepository;
 use App\Repository\EtatRepository;
 use App\Service\VendeurService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,9 +13,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ConcurrentController extends AbstractController
 {
-
+    private $articleRepository;
     private $etatRepository;
     private $articleConcurrentRepository;
+    private $articleVendeurRepository;    
     
     private const ETATS_CALCUL = [
         1 => 'Etat moyen',
@@ -23,10 +26,15 @@ class ConcurrentController extends AbstractController
         5 => 'Neuf'
     ];
 
-    public function __construct(EtatRepository $etatRepository, ArticleConcurrentRepository $articleConcurrentRepository) 
+    public function __construct(ArticleRepository $articleRepository,
+                                EtatRepository $etatRepository, 
+                                ArticleConcurrentRepository $articleConcurrentRepository,
+                                ArticleVendeurRepository $articleVendeurRepository) 
     {
+        $this->articleRepository = $articleRepository;
         $this->etatRepository = $etatRepository;
         $this->articleConcurrentRepository = $articleConcurrentRepository;
+        $this->articleVendeurRepository = $articleVendeurRepository;
     }
 
     /**
@@ -70,6 +78,9 @@ class ConcurrentController extends AbstractController
         $prixPlancher = $request->get('prix_plancher');
         $etatForm = $request->get('selectEtats');
 
+        // Get Article
+        $article = $this->articleRepository->find($idArticle);
+
         // Get Etat
         $etat = $this->etatRepository->findOneBy(
             ['intitule' => $etatForm]
@@ -90,38 +101,49 @@ class ConcurrentController extends AbstractController
         /////////////////////// Concurrents avec MEILLEUR état /////////////////////
         $prixMeilleurEtat = [];
 
-        if (!count($prixMemeEtat)) {
-
-            $etatMeilleur = '';          
-            $indice = 0;
-            foreach(self::ETATS_CALCUL as $cle => $valeur) {
-                if ($valeur == $etatForm) {
-                    $indice = $cle;
-                } elseif ($indice > 0) {
-                    $etatMeilleur = $valeur;
-                    break;
-                }
-            }
-
-            // Get Etat
-            $etat = $this->etatRepository->findOneBy(
-                ['intitule' => $etatMeilleur]
-            );
-
-            $articlesMemeEtat = $this->articleConcurrentRepository->findBy(
-                [ 'etat' => $etat]
-            );
-
-            foreach($articlesMemeEtat as $ac) {
-                if (!in_array($ac->getPrix(), $prixMeilleurEtat)) {
-                    $prixMeilleurEtat[] = $ac->getPrix();
-                }
+        $intituleEtat = '';          
+        $indice = 0;
+        foreach(self::ETATS_CALCUL as $cle => $valeur) {
+            if ($valeur == $etatForm) {
+                $indice = $cle;
+            } elseif ($indice > 0) {
+                $intituleEtat = $valeur;
+                break;
             }
         }
 
-        // Service 
-        $venderuService  = new VendeurService($this->getDoctrine()->getManager());
-        $retour = $venderuService->calculerPrix($prixPlancher, $prixMemeEtat, $prixMeilleurEtat);
+        // Get Etat
+        $etatMeilleur = $this->etatRepository->findOneBy(
+            ['intitule' => $intituleEtat]
+        );
+
+        $articlesMemeEtat = $this->articleConcurrentRepository->findBy(
+            [ 'etat' => $etatMeilleur]
+        );
+
+        foreach($articlesMemeEtat as $ac) {
+            if (!in_array($ac->getPrix(), $prixMeilleurEtat)) {
+                $prixMeilleurEtat[] = $ac->getPrix();
+            }
+        }
+
+        // Vérifier que le prix de l'article n'a pas été fixé auparavent pour cet état         
+        $articleAvecPrix = $this->articleVendeurRepository->findOneBy(
+            ['article' => $article, 'etat' => $etat]
+        );
+
+        if (!$articleAvecPrix) {
+
+            // Service 
+            $venderuService  = new VendeurService($this->getDoctrine()->getManager());
+            $prix_de_vente = $venderuService->calculerPrix($article, $etat, $prixPlancher, $prixMemeEtat, $prixMeilleurEtat);
+
+            if ($prix_de_vente > 0) {
+                // Todo : Envoyer message POSITIF à la vue
+            } else {
+                // Todo : Envoyer message NEGATIF à la vue
+            }
+        }
 
         // Si la requete n'est pas bonne
         return $this->redirect($this->generateUrl('articles_list'));
