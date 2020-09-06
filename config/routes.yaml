@@ -1,3 +1,11 @@
 index:
     path: /
     controller: App\Controller\DefaultController::index
+
+articles_list:
+    path: /articles
+    controller: App\Controller\ArticleController::index
+
+concurrents_list:
+    path: /concurrents
+    controller: App\Controller\ConcurrentController::index
