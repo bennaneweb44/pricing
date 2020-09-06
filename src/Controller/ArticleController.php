@@ -10,12 +10,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class ArticleController extends AbstractController
 {   
     private $articleRepository;
-    private $articleConcurrentRepository;
 
-    public function __construct(ArticleRepository $articleRepository, ArticleConcurrentRepository $articleConcurrentRepository) 
+    public function __construct(ArticleRepository $articleRepository) 
     {
         $this->articleRepository = $articleRepository;
-        $this->articleConcurrentRepository = $articleConcurrentRepository;
     }
 
     /**

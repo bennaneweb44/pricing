@@ -13,8 +13,6 @@ class DefaultController extends AbstractController
             return $this->redirect($this->generateUrl('app_login'));
         }
         
-        return $this->render('default/index.html.twig', [
-            
-        ]);
+        return $this->render('default/index.html.twig', []);
     }
 }

@@ -9,3 +9,12 @@ articles_list:
 concurrents_list:
     path: /concurrents
     controller: App\Controller\ConcurrentController::index
+
+placer_concurrence_form:
+    path: /article/{id}/concurrencer
+    controller: App\Controller\ConcurrentController::placerForm
+
+placer_concurrence_action:
+    path: /article/concurrencer/action
+    controller: App\Controller\ConcurrentController::placerAction
+    methods: POST

@@ -105,19 +105,19 @@ class ArticleFixture extends Fixture
         $this->articlesConcurrents = [
             'Abc jeux' => [
                 'etat' => 'Etat moyen',
-                'prix' => 14,10
+                'prix' => 14.10
             ],
             'Games-planete' => [
                 'etat' => 'Etat moyen',
-                'prix' => 16,20
+                'prix' => 16.20
             ],
             'Media-games' => [
                 'etat' => 'Bon état',
-                'prix' => 18
+                'prix' => 18.00
             ],
             'Tous-les-jeux' => [
                 'etat' => 'Bon état',
-                'prix' => 24,44
+                'prix' => 24.44
             ],
             'Micro-jeux' => [
                 'etat' => 'Très bon état',
@@ -125,15 +125,15 @@ class ArticleFixture extends Fixture
             ],
             'Top-Jeux-video' => [
                 'etat' => 'Très bon état',
-                'prix' => 21,50
+                'prix' => 21.50
             ],            
             'Diffusion-133' => [
                 'etat' => 'Comme neuf',
-                'prix' => 29
+                'prix' => 29.00
             ],
             'France-video' => [
                 'etat' => 'Neuf',
-                'prix' => 30,99
+                'prix' => 30.99
             ],
         ];
     }

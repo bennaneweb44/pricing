@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Articles - Pricing{% endblock %}
+
+{% block titlePage %}
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h4 class="display-4"><i class="fas fa-rocket"></i> Concurrencer</h4>
+        <large>Fifa 20 Utltimate Edition</large>
+    </div>
+{% endblock %}
+
+{% block body %}
+
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    table { min-height: 250px }    
+</style>
+
+<div class="example-wrapper">
+    <form id="formPlacerConcurrence" action="{{ path('placer_concurrence_action') }}" method="post">        
+        <fieldset>
+            
+            <div class="form-group">
+                <label for="selection">Etat du produit</label>
+                <select id="selectEtats" name="selectEtats" class="form-control">
+                    {% for etat in etats %}
+                        <option value="{{ etat.intitule }}">{{ etat.intitule }}</option>
+                    {% endfor %}
+                </select>                
+            </div>
+
+            <input type="hidden" name="id_article" value="{{ id_article }}" />
+            
+            <div class="form-group">
+                <label for="nom">Prix plancher (€)</label>
+                <input type="text" class="form-control" id="prix_plancher" name="prix_plancher" placeholder="Prix plancher">
+            </div>
+            
+            <div class="form-group">
+                <div class="text-center">
+                    <button class="btn btn-md btn-primary" type="submit" style="width: 33%">
+                        Placer
+                    </button>
+                </div>
+            </div>
+
+        </fieldset>
+    </form>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+
+    <script>
+        $('form#formPlacerConcurrence').submit(function() {
+            var prix_plancher_saisi = $('#prix_plancher').val();
+            if (!$.isNumeric(prix_plancher_saisi)) {
+                $('#prix_plancher').css('border-color', 'red');
+                return false;
+            } else {                
+                $('#prix_plancher').css('border-color', '#ccc');
+                $(this).submit();
+                return false;
+            }   
+        });
+    </script>
+
+{% endblock %}
