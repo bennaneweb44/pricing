@@ -38,8 +38,7 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
     }
 
     public function supports(Request $request)
-    {
-        dd($request->attributes->get('_route'));
+    {   
         return 'app_login' === $request->attributes->get('_route')
             && $request->isMethod('POST');
     }
@@ -70,7 +69,7 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
 
         if (!$user) {
             // fail authentication with a custom error
-            throw new CustomUserMessageAuthenticationException('Email could not be found.');
+            throw new CustomUserMessageAuthenticationException('Cet e-mail n\'existe pas dans notre système.');
         }
 
         return $user;
@@ -87,8 +86,7 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
             return new RedirectResponse($targetPath);
         }
 
-        // For example : return new RedirectResponse($this->router->generate('some_route'));
-        throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
+        return new RedirectResponse($this->router->generate('index'));
     }
 
     protected function getLoginUrl()
