@@ -41,17 +41,17 @@ class VendeurService
         sort($prixMemeEtat);
         sort($prixEtatSuperieur);
 
-        foreach($prixMemeEtat as $prix) {
-            if ($prixPlancher <= floatval($prix) - 0.01 ) {                
-                $prixDeVente = floatval($prix) - 0.01;
+        foreach($prixMemeEtat as $prix_m) {
+            if ($prixPlancher <= floatval($prix_m) - 0.01 ) {                
+                $prixDeVente = floatval($prix_m) - 0.01;
                 break;
             }   
         }        
         
         if ($prixDeVente == 0) {
-            foreach($prixEtatSuperieur as $prix) {
-                if ($prixPlancher <= floatval($prix) - 1) {
-                    $prixDeVente = floatval($prix) - 1;
+            foreach($prixEtatSuperieur as $prix_s) {
+                if ($prixPlancher <= floatval($prix_s) - 1) {
+                    $prixDeVente = floatval($prix_s) - 1;
                     break;
                 }   
             }

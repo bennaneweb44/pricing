@@ -138,11 +138,17 @@ class ConcurrentController extends AbstractController
             $venderuService  = new VendeurService($this->getDoctrine()->getManager());
             $prix_de_vente = $venderuService->calculerPrix($article, $etat, $prixPlancher, $prixMemeEtat, $prixMeilleurEtat);
 
-            if ($prix_de_vente > 0) {
-                // Todo : Envoyer message POSITIF à la vue
-            } else {
+            if ($prix_de_vente == 0) {
                 // Todo : Envoyer message NEGATIF à la vue
+                $this->addFlash('warning', 'Le prix n\'a pu être fixé pour cet article car il dépasse le prix plancher !');
+            } else {
+                // Todo : Envoyer message POSITIF à la vue
+                $this->addFlash('success', 'L\'article dont l\'état est <b>'.$etatForm.'</b> a été positionné au prix de <b>'.$prix_de_vente.' €</b>.');
             }
+
+        } else {
+            // Todo : Le prix a déjà été fixé pour cet article
+            $this->addFlash('warning', 'Attention, le prix a déjà été fixé pour cet article avec cet état.');
         }
 
         // Si la requete n'est pas bonne

@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block body %}
-<form method="post">
+<form method="post" id="formConnexion">
 
     {% if error %}
         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
@@ -49,13 +49,40 @@
 
         <br>
         
-        <div class="text-center">
+        <div class="text-center">            
             <button class="btn btn-md btn-primary" type="submit" style="width: 33%">
-                C'est parti !
+                <div id="spanLoader" class="loader d-none"></div> Connexion                
             </button>
         </div>
 
     </div>
 
 </form>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $('#formConnexion').on('submit', function() {                              
+            $('#spanLoader').removeClass('d-none');            
+        });
+    </script>
+    <style>
+        .loader {
+            border: 2px solid #f3f3f3; /* Light grey */
+            border-top: 2px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            animation: spin 2s linear infinite;
+            float: left;
+            position: relative;
+            left: 80px;            
+            margin-right: -20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 {% endblock %}
