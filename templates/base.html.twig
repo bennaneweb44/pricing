@@ -17,17 +17,29 @@
             <h3 class="my-0 mr-md-auto font-weight-normal" ><i class="fa fa-coin"></i> <a href="{{ path('index') }}" style="color: #000">Pricing</a></h3>
             {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}                
                 <a class="p-2 text-dark mr-2" href="{{ path('index') }}"><i class="fas fa-home"></i> Accueil</a>  
-                <nav class="my-2 my-md-0 mr-md-3">
+                
+                <nav class="my-2 my-md-0 mr-md-3">                    
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         <i class="fas fa-barcode"></i> Articles
                         <b class="caret"></b>
-                    </a>
+                    </a>                    
                     <ul class="dropdown-menu p-2">                        
                         <a class="p-2 text-dark" href="{{ path('articles_list') }}">Non concurrencés</a> <br>
-                        <a class="p-2 text-dark" href="{{ path('articles_vendeur_list') }}">Concurrencés</a>
+                        <a class="p-2 text-dark" href="{{ path('articles_vendeur_list') }}">Mis en concurrence</a>
                     </ul>
-                    <a class="p-2 text-dark" href="{{ path('concurrents_list') }}"><i class="fas fa-users"></i> Concurrents</a>                    
                 </nav>
+
+                <nav class="my-2 my-md-0 mr-md-3">                    
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fas fa-users"></i> Concurrents
+                        <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu p-2">                        
+                        <a class="p-2 text-dark" href="{{ path('concurrents_list_etat_get', {'etat' : 1}) }}">Meilleurs offres</a> <br>
+                        <a class="p-2 text-dark" href="{{ path('concurrents_list') }}">Tous</a>
+                    </ul>
+                </nav>
+
                 <a class="btn btn-outline-danger" href="{{ path('app_logout') }}"><i class="fa fa-sign-out"></i> Déconnexion</a>
             {% else %}                
                 <a class="btn btn-outline-success" href="{{ path('app_login') }}"><i class="fa fa-sign-in"></i> Connexion</a>
@@ -37,6 +49,24 @@
         {% block titlePage %}{% endblock %}
 
         <div class="container">
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success">
+                    <i class="fa fa-check"></i> {{ message |raw }}
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('warning') %}
+                <div class="alert alert-warning">
+                    <i class="fa fa-exclamation-triangle"></i> {{ message |raw }}
+                </div>        
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger">
+                    <i class="fa fa-times-circle"></i> {{ message |raw }}
+                </div>
+            {% endfor %}
             
             {% block body %}{% endblock %}            
 
@@ -74,10 +104,21 @@
 </html>
 
 <style>
+    
     a:hover {
         text-decoration: none;
     }
+    
     .dropdown-toggle, .dropdown-toggle:hover {
         color: #000;
     }
+
+    .poubelle, .crayon { 
+        font-size: 15px;         
+    }
+
+    .poubelle {
+        color: red;
+    }
+    
 </style>

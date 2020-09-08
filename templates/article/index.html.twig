@@ -16,24 +16,6 @@
 </style>
 
 <div class="example-wrapper">
-
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success">
-            <i class="fa fa-check"></i> {{ message |raw }}
-        </div>
-    {% endfor %}
-
-    {% for message in app.flashes('warning') %}
-        <div class="alert alert-warning">
-            <i class="fa fa-exclamation-triangle"></i> {{ message |raw }}
-        </div>        
-    {% endfor %}
-
-    {% for message in app.flashes('error') %}
-        <div class="alert alert-danger">
-            <i class="fa fa-times-circle"></i> {{ message |raw }}
-        </div>
-    {% endfor %}
     
     <table class="table">
         <thead>

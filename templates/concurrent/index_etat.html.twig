@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Articles - Pricing{% endblock %}
+
+{% block titlePage %}
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h2><i class="fas fa-chart-bar"></i> Meilleures offres</h2>
+        
+            <h6>Article : <b>Fifa 20 Utltimate Edition</b></h6>
+        
+        <!-- Etat -->
+        <form id="formReloadEtat" method="POST" action="{{ path('concurrents_list_etat_post') }}">            
+            <input type="hidden" value="" name="etatChoisi" id="etatChoisi" />
+        </form>
+
+        <div class="d-flex justify-content-center">
+            
+            <select id="selectEtats" name="selectEtats" class="form-control">
+                {% set id_etat = 1 %}
+                {% for etat in tous_etats %}
+                    <option value="{{ id_etat }}" {% if etatSelectionne == etat.intitule %}selected{% endif %}>Etat : {{ etat.intitule }}</option>
+                    {% set id_etat =  id_etat + 1 %}
+                {% endfor %}
+            </select>
+        </div>        
+        
+    </div>
+{% endblock %}
+
+{% block body %}
+
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    table { min-height: 250px }    
+    #selectEtats { width: 10% }
+    #selectEtats { border: 1px solid #000 }
+</style>
+
+<div class="example-wrapper">
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Société</th>
+                <th scope="col">Ville</th>
+                <th scope="col">Tél</th>
+                <th scope="col">Prix</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if concurrentsArticleEtat| length > 0 %}
+                {% set compteur = 1 %}
+                {% for cae in concurrentsArticleEtat %}
+                    <tr>
+                        <th scope="row">{{ compteur }}</th>
+                        <td>{{ cae.concurrent.nom }}</td>
+                        <td>{{ cae.concurrent.ville }}</td>
+                        <td>{{ cae.concurrent.tel }}</td>
+                        <td><b>{{ cae.prix  }} €<b></td>
+                    </tr>
+                    {% set compteur = compteur + 1 %}
+                {% endfor %}    
+            {% else %}
+                <tr class="text-center">
+                    <td colspan="3" class="pt-5">Aucune concurrent enregistré.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>        
+        $("#selectEtats").change(function(e) {
+            e.preventDefault();
+            var id_etat = $(this).children("option:selected").val();     
+            $('#etatChoisi').val(id_etat);       
+            $('form#formReloadEtat').submit();
+        });
+    </script>
+{% endblock %}

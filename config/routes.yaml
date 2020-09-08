@@ -10,6 +10,16 @@ concurrents_list:
     path: /concurrents
     controller: App\Controller\ConcurrentController::index
 
+concurrents_list_etat_get:
+    path: /concurrents/{etat}
+    controller: App\Controller\ConcurrentController::indexEtatGet
+    methods: GET
+
+concurrents_list_etat_post:
+    path: /concurrents/etat
+    controller: App\Controller\ConcurrentController::indexEtatPost
+    methods: POST
+
 articles_vendeur_list:
     path: /articles/vendeur
     controller: App\Controller\ArticleVendeurController::index

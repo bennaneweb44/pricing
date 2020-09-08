@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\ArticleConcurrentRepository;
 use App\Repository\ArticleRepository;
 use App\Repository\ArticleVendeurRepository;
+use App\Repository\ConcurrentRepository;
 use App\Repository\EtatRepository;
 use App\Service\VendeurService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,6 +16,7 @@ class ConcurrentController extends AbstractController
 {
     private $articleRepository;
     private $etatRepository;
+    private $concurrentRepository;
     private $articleConcurrentRepository;
     private $articleVendeurRepository;    
     
@@ -26,13 +28,17 @@ class ConcurrentController extends AbstractController
         5 => 'Neuf'
     ];
 
+    private const REF_ARTICLE_TEST = 'JVD-105057';
+
     public function __construct(ArticleRepository $articleRepository,
                                 EtatRepository $etatRepository, 
+                                ConcurrentRepository $concurrentRepository,
                                 ArticleConcurrentRepository $articleConcurrentRepository,
                                 ArticleVendeurRepository $articleVendeurRepository) 
     {
         $this->articleRepository = $articleRepository;
         $this->etatRepository = $etatRepository;
+        $this->concurrentRepository = $concurrentRepository;
         $this->articleConcurrentRepository = $articleConcurrentRepository;
         $this->articleVendeurRepository = $articleVendeurRepository;
     }
@@ -41,10 +47,63 @@ class ConcurrentController extends AbstractController
      * @Route("/concurrents", name="concurrents_list")
      */
     public function index()
-    {
+    {      
+        $all_concurrents = $this->concurrentRepository->findAll();
+        
         return $this->render('concurrent/index.html.twig', [
-            'controller_name' => 'ConcurrentController',
+            'all_concurrents' => $all_concurrents,
         ]);
+    }
+
+
+    /**
+     * @Route("/concurrents/{etat}", name="concurrents_list_etat_get")
+     */
+    public function indexEtatGet($etat)
+    {
+        $int_ids = array_keys(self::ETATS_CALCUL);
+        if (!in_array($etat, $int_ids)) {
+            $this->addFlash('danger', 'Oups, l\'adresse demandée n\'est pas correcte !');            
+            return $this->redirect($this->generateUrl('index'));
+        }
+
+        // Article (défaut)
+        $article = $this->articleRepository->findBy(
+            ['reference' => self::REF_ARTICLE_TEST]
+        );
+
+        // Etat (défaut)
+        $etatSelectionne = self::ETATS_CALCUL[$etat];
+        $etat = $this->etatRepository->findBy(
+            ['intitule' => $etatSelectionne]
+        );
+
+        // Tous les états
+        $tous_etats = $this->etatRepository->findAll();
+
+        // Concurrents pour cet Article et cet Etat
+        $concurrentsArticleEtat = $this->articleConcurrentRepository->findBy([
+            'etat' => $etat,
+            'article' => $article
+        ]);
+
+        return $this->render('concurrent/index_etat.html.twig', [
+            'concurrentsArticleEtat' => $concurrentsArticleEtat,
+            'article' => $article,
+            'etatSelectionne' => $etatSelectionne,
+            'tous_etats' => $tous_etats
+        ]);
+    }
+
+    /**
+     * Redirection vers la méthode en GET si séléction à partir de liste déroulante
+     * 
+     * @Route("/concurrents/etat", name="concurrents_list_etat_post")
+     */
+    public function indexEtatPost(Request $request)
+    {
+        $id_etat = $request->get('etatChoisi');
+        return $this->redirect($this->generateUrl('concurrents_list_etat_get', ['etat' => $id_etat ] ));
     }
 
     /**
@@ -67,7 +126,7 @@ class ConcurrentController extends AbstractController
         // Si la requete n'est pas bonne
         return $this->render('default/index.html.twig', []);
     }
-
+    
     /**
      * @Route("/article/concurrencer/action", name="placer_concurrence_action")
      */
