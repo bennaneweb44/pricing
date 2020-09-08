@@ -25,7 +25,7 @@ articles_vendeur_list:
     controller: App\Controller\ArticleVendeurController::index
 
 placer_concurrence_form:
-    path: /article/{id}/concurrencer
+    path: /article/{id}/etat/{etatSelectionne}/concurrencer
     controller: App\Controller\ConcurrentController::placerForm
 
 placer_concurrence_action:

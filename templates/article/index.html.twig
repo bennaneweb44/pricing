@@ -4,7 +4,7 @@
 
 {% block titlePage %}
     <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-        <h2><i class="fas fa-barcode"></i> Articles non concurrencés</h2>
+        <h2><i class="fas fa-barcode"></i> Liste des articles</h2>
     </div>
 {% endblock %}
 
@@ -38,7 +38,7 @@
                             {% if article.concurrence == 0 %}                                
                                 <i class="fas fa-rocket" style="font-size: 20px; color:#ccc"></i>                                                            
                             {% else %}
-                                <a href="{{ path('placer_concurrence_form', {'id' : article.id}) }}" title="Concurrencer">
+                                <a href="{{ path('placer_concurrence_form', {'id' : article.id, 'etatSelectionne' : 1 }) }}" title="Concurrencer">
                                     <i class="fas fa-rocket" style="font-size: 20px; color:#0C40D5"></i>                            
                                 </a>                                
                             {% endif %}

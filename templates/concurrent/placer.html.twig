@@ -24,7 +24,7 @@
                 <label for="selection">Etat du produit</label>
                 <select id="selectEtats" name="selectEtats" class="form-control">
                     {% for etat in etats %}
-                        <option value="{{ etat.intitule }}">{{ etat.intitule }}</option>
+                        <option value="{{ etat.intitule }}" {% if etats_fixes[etatSelectionne] == etat.intitule %}selected{% endif %} >{{ etat.intitule }}</option>
                     {% endfor %}
                 </select>                
             </div>

@@ -28,7 +28,7 @@ class ConcurrentController extends AbstractController
         5 => 'Neuf'
     ];
 
-    private const REF_ARTICLE_TEST = 'JVD-105057';
+    private const REF_ARTICLE_EXEMPLE = 'JVD-105057';
 
     public function __construct(ArticleRepository $articleRepository,
                                 EtatRepository $etatRepository, 
@@ -68,30 +68,33 @@ class ConcurrentController extends AbstractController
         }
 
         // Article (défaut)
-        $article = $this->articleRepository->findBy(
-            ['reference' => self::REF_ARTICLE_TEST]
+        $article = $this->articleRepository->findOneBy(
+            ['reference' => self::REF_ARTICLE_EXEMPLE]
         );
 
         // Etat (défaut)
         $etatSelectionne = self::ETATS_CALCUL[$etat];
-        $etat = $this->etatRepository->findBy(
+        $etatObjet = $this->etatRepository->findBy(
             ['intitule' => $etatSelectionne]
         );
 
         // Tous les états
         $tous_etats = $this->etatRepository->findAll();
 
-        // Concurrents pour cet Article et cet Etat
+        // Concurrents pour cet Article et cet Etat (prix : asc)
         $concurrentsArticleEtat = $this->articleConcurrentRepository->findBy([
-            'etat' => $etat,
+            'etat' => $etatObjet,
             'article' => $article
+        ], [
+            'prix' => 'ASC'
         ]);
 
-        return $this->render('concurrent/index_etat.html.twig', [
+        return $this->render('concurrent/meilleurs_offres.html.twig', [
             'concurrentsArticleEtat' => $concurrentsArticleEtat,
             'article' => $article,
-            'etatSelectionne' => $etatSelectionne,
-            'tous_etats' => $tous_etats
+            'etatSelectionne' => $etat,
+            'tous_etats' => $tous_etats,
+            'etats_fixes' => self::ETATS_CALCUL
         ]);
     }
 
@@ -107,11 +110,12 @@ class ConcurrentController extends AbstractController
     }
 
     /**
-     * @Route("/article/{id}/concurrencer", name="placer_concurrence_form")
+     * @Route("/article/{id}/concurrencer/{etatSelectionne}", name="placer_concurrence_form")
      */
-    public function placerForm($id)
-    {        
-        if (is_numeric($id) && $id > 0) {
+    public function placerForm($id, $etatSelectionne)
+    {
+        if (is_numeric($id) && $id > 0 && 
+            is_numeric($etatSelectionne) && in_array($etatSelectionne, array_keys(self::ETATS_CALCUL))) {
 
             // Récupérer les états
             $etats = $this->etatRepository->findAll();            
@@ -119,6 +123,8 @@ class ConcurrentController extends AbstractController
             return $this->render('concurrent/placer.html.twig', [
                 'controller_name' => 'ConcurrentController',
                 'etats' => $etats,
+                'etats_fixes' => self::ETATS_CALCUL,
+                'etatSelectionne' => $etatSelectionne,
                 'id_article' => $id
             ]);    
         }
