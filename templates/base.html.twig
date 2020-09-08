@@ -52,18 +52,21 @@
 
             {% for message in app.flashes('success') %}
                 <div class="alert alert-success">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
                     <i class="fa fa-check"></i> {{ message |raw }}
                 </div>
             {% endfor %}
 
             {% for message in app.flashes('warning') %}
                 <div class="alert alert-warning">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
                     <i class="fa fa-exclamation-triangle"></i> {{ message |raw }}
-                </div>        
+                </div>      
             {% endfor %}
 
-            {% for message in app.flashes('error') %}
+            {% for message in app.flashes('error') %}                
                 <div class="alert alert-danger">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
                     <i class="fa fa-times-circle"></i> {{ message |raw }}
                 </div>
             {% endfor %}
@@ -119,6 +122,12 @@
 
     .poubelle {
         color: red;
+        cursor: pointer;
+        border: none;
+    }
+    
+    .poubelle:focus {        
+        outline: none;
     }
     
 </style>

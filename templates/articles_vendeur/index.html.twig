@@ -17,7 +17,33 @@
     .badge-inverse { background-color: #FC6AA8; color: whitesmoke }    
 </style>
 
-<div class="example-wrapper">
+<div class="example-wrapper">    
+
+    <!-- Modal Suppression prix -->
+    <div class="modal fade" id="deleteLink" tabindex="-1" role="dialog" aria-labelledby="deleteLinkLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title" id="deleteLinkLabel"><i class="fas fa-trash-alt poubelle"></i> Suppression</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <form method="post" action="{{ path('articles_vendeur_delete') }}">
+                        <input type="hidden" val="" id="idArticleVendeur" name="idArticleVendeur" />
+                        Voulez-vous vraiment supprimer le prix de cet article ?
+                        <div class="text-right mt-3">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
     
     <table class="table table-sm">
         <thead>
@@ -58,9 +84,8 @@
                         <td>{{ articleVend.plancher }} €</td>
                         <td><b>{{ articleVend.prix }} €</b></td>
                         <td>
-                            <a href="" title="Supprimer">
-                                <i class="fas fa-trash-alt poubelle"></i>                            
-                            </a>
+                            <button href="#" type="button" data-id="{{ articleVend.id }}" data-toggle="modal" title="Supprimer" data-target="#deleteLink" class="delete-Link fas fa-trash-alt poubelle">                                 
+                            </button>                            
                         </td>
                     </tr>
                     {% set compteur = compteur + 1 %}
@@ -75,4 +100,14 @@
 
 
 </div>
+{% endblock %}
+
+{% block javascripts %}
+    
+    <script>
+        $('#deleteLink').on('show.bs.modal', function (e) {
+            $("#idArticleVendeur").val($(e.relatedTarget).data('id'));
+        });
+    </script>
+    
 {% endblock %}

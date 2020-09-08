@@ -24,6 +24,11 @@ articles_vendeur_list:
     path: /articles/vendeur
     controller: App\Controller\ArticleVendeurController::index
 
+articles_vendeur_delete:
+    path: /articles/vendeur/delete/
+    controller: App\Controller\ArticleVendeurController::delete
+    methods: POST
+
 placer_concurrence_form:
     path: /article/{id}/etat/{etatSelectionne}/concurrencer
     controller: App\Controller\ConcurrentController::placerForm

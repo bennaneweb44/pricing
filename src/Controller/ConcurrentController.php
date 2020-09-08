@@ -117,6 +117,10 @@ class ConcurrentController extends AbstractController
         if (is_numeric($id) && $id > 0 && 
             is_numeric($etatSelectionne) && in_array($etatSelectionne, array_keys(self::ETATS_CALCUL))) {
 
+            // Get Article
+            $article = $this->articleRepository->find($id);
+
+
             // Récupérer les états
             $etats = $this->etatRepository->findAll();            
 
@@ -125,7 +129,7 @@ class ConcurrentController extends AbstractController
                 'etats' => $etats,
                 'etats_fixes' => self::ETATS_CALCUL,
                 'etatSelectionne' => $etatSelectionne,
-                'id_article' => $id
+                'article' => $article
             ]);    
         }
 
@@ -176,13 +180,13 @@ class ConcurrentController extends AbstractController
             }
         }
 
-        // Get Etats
-        $etats = $this->etatRepository->findByIntitules($intituleEtat);
-
-        $articlesEtatsDifferents = $this->articleConcurrentRepository->getArticlesConcurrentsWithEtats($etats);
-
-        foreach($articlesEtatsDifferents as $ac) {
-            $prixMeilleurEtat[$ac->getEtat()->getIntitule()][] = $ac->getPrix();
+        // Etats supérieurs existent ( <> 'Neuf' )
+        if (count($intituleEtat)) {        
+            $etats = $this->etatRepository->findByIntitules($intituleEtat);            
+            $articlesEtatsDifferents = $this->articleConcurrentRepository->getArticlesConcurrentsWithEtats($etats);
+            foreach($articlesEtatsDifferents as $ac) {
+                $prixMeilleurEtat[$ac->getEtat()->getIntitule()][] = $ac->getPrix();
+            }
         }
 
         // Vérifier que le prix de l'article n'a pas été fixé auparavent pour cet état         
@@ -202,7 +206,7 @@ class ConcurrentController extends AbstractController
                 $this->addFlash('warning', 'Le prix n\'a pu être fixé pour cet article. Veuillez vérifier votre prix plancher !');
             } else {
                 // Todo : Envoyer message POSITIF à la vue
-                $this->addFlash('success', 'L\'article dont l\'état est <b>'.$etatForm.'</b> a été positionné au prix de <b>'.$prix_de_vente.' €</b>.');
+                $this->addFlash('success', 'L\'article <b>'.$article->getLibelle().'</b> dont l\'état est <b>'.$etatForm.'</b> a été positionné au prix de <b>'.$prix_de_vente.' €</b>.');
             }
 
         } else {
