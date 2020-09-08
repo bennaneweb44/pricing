@@ -43,10 +43,10 @@
                             {% set compteur = compteur + 1 %}
                         {% endfor %}
                     {% else %}
-                        <li>Aucune article concurrencé.</li>
+                        <li>Aucun article concurrencé.</li>
                     {% endif %}
                 </ul>
-                <a type="button" id="bouttonAccueil" href="{{ path('articles_vendeur_list') }}" class="btn btn-lg btn-block btn-primary">
+                <a type="button" id="bouttonAccueil" href="{{ path('articles_vendeur_list') }}" class="btn btn-lg btn-block btn-primary {% if articlesVendeurs| length == 0 %}disabled{% endif %}">
                     <i class="fas fa-list"></i> Tous les articles
                 </a>
             </div>
@@ -65,7 +65,7 @@
                             {% set compteur = compteur + 1 %}
                         {% endfor %}
                     {% else %}
-                        <li>Aucune concurrent concurrencé.</li>
+                        <li>Aucun concurrent enregistré.</li>
                     {% endif %}
                 </ul>
                 <a type="button" id="bouttonConcurrents" href="{{ path('concurrents_list') }}" class="btn btn-lg btn-block btn-primary">
