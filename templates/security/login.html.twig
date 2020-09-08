@@ -5,11 +5,12 @@
 {% block titlePage %}
     <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
         <h3 class="display-4">Bienvenue</h3>
-        <p class="lead">Cet outil a pour objectif de placer un produit face à la concurrence, il utilise pour ça un algorithme respectant les exigences demandées.</p>
+        <p class="lead">Cet outil a pour objectif de placer un produit face à la concurrence, <br>il utilise pour ça un algorithme respectant les exigences demandées.</p>
     </div>
 {% endblock %}
 
 {% block body %}
+
 <form method="post" id="formConnexion">
 
     {% if error %}
@@ -22,9 +23,9 @@
         </div>
     {% endif %}
 
-    <div class="flex flex-5 p-5">
+    <div id="divConnexion" class="flex flex-5">
 
-    <h4 class="h4 mb-3 font-weight-normal text-center">Ouvrir une session</h4>
+        <h4 class="h4 mb-3 font-weight-normal text-center">Ouvrir une session</h4>
 
         <label for="inputEmail">Adresse e-mail</label>
         <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" required autofocus>
@@ -76,13 +77,17 @@
             animation: spin 2s linear infinite;
             float: left;
             position: relative;
-            left: 80px;            
+            left: 18px;            
             margin-right: -20px;
         }
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        #divConnexion {
+            padding: 20px 200px;
         }
     </style>
 {% endblock %}

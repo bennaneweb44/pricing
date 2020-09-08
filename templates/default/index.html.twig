@@ -24,7 +24,22 @@
                     {% if articlesVendeurs| length > 0 %}
                         {% set compteur = 1 %}
                         {% for articleVend in articlesVendeurs %}
-                            <li><b>{{ articleVend.article.libelle }}</b> positionné à <b>{{ articleVend.prix }} € </b>({{ articleVend.etat.intitule }})</li>
+
+                            {% set couleurBadge = '' %}
+                    
+                            {% if articleVend.etat.intitule == 'Etat moyen' %}
+                                {% set couleurBadge = 'badge-default' %}        
+                            {% elseif articleVend.etat.intitule == 'Bon état' %}
+                                {% set couleurBadge = 'badge-warning' %}
+                            {% elseif articleVend.etat.intitule == 'Très bon état' %}
+                                {% set couleurBadge = 'badge-success' %}
+                            {% elseif articleVend.etat.intitule == 'Comme neuf' %}        
+                                {% set couleurBadge = 'badge-info' %}
+                            {% elseif articleVend.etat.intitule == 'Neuf' %}        
+                                {% set couleurBadge = 'badge-inverse' %}
+                            {% endif %}
+
+                            <li><b>{{ articleVend.article.libelle }}</b> positionné à <b>{{ articleVend.prix }} € </b> <span class="badge {{ couleurBadge }}">{{ articleVend.etat.intitule }}</span></li>
                             {% set compteur = compteur + 1 %}
                         {% endfor %}
                     {% else %}
@@ -39,16 +54,23 @@
 
         <div class="card mb-4 box-shadow">
             <div class="card-header">
-                <h5 class="my-0 font-weight-normal"><i class="fas fa-chart-bar"></i> Meilleures offres des concurrents</h5>
+                <h5 class="my-0 font-weight-normal"><i class="fas fa-users"></i> Derniers concurrents enregistrés</h5>
             </div>
             <div class="card-body">                
                 <ul class="list-unstyled mt-3 mb-4">
-                    <li>TODO : Offre 1</li>
-                    <li>TODO : Offre 2</li>
-                    <li>TODO : Offre 3</li>
-                    <li>TODO : Offre 4</li>
+                    {% if allConcurrents| length > 0 %}
+                        {% set compteur = 1 %}
+                        {% for concurrent in allConcurrents %}
+                            <li><b>{{ concurrent.nom }}</b> - {{ concurrent.ville }}</li>
+                            {% set compteur = compteur + 1 %}
+                        {% endfor %}
+                    {% else %}
+                        <li>Aucune concurrent concurrencé.</li>
+                    {% endif %}
                 </ul>
-                <button type="button" class="btn btn-lg btn-block btn-primary"><i class="fas fa-list"></i> Toutes les offres</button>
+                <a type="button" id="bouttonConcurrents" href="{{ path('concurrents_list') }}" class="btn btn-lg btn-block btn-primary">
+                    <i class="fas fa-list"></i> Tous les concurrents
+                </a>
             </div>
         </div>
 
@@ -58,10 +80,14 @@
 
 {% block javascripts %}
     <style>
-        #bouttonAccueil {
+        #bouttonAccueil, #bouttonConcurrents {
             position: absolute;
             bottom: 15px;
             width: 92%;
+        }
+
+        .card-body {
+            min-height: 250px;
         }
     </style>
 {% endblock %}

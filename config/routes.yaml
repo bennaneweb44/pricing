@@ -10,6 +10,11 @@ concurrents_list:
     path: /concurrents
     controller: App\Controller\ConcurrentController::index
 
+concurrent_update:
+    path: /concurrents/update
+    controller: App\Controller\ConcurrentController::update
+    methods: POST
+
 concurrents_list_etat_get:
     path: /concurrents/{etat}
     controller: App\Controller\ConcurrentController::indexEtatGet

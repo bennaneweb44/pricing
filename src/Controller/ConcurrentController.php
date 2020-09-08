@@ -8,6 +8,7 @@ use App\Repository\ArticleVendeurRepository;
 use App\Repository\ConcurrentRepository;
 use App\Repository\EtatRepository;
 use App\Service\VendeurService;
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -19,6 +20,8 @@ class ConcurrentController extends AbstractController
     private $concurrentRepository;
     private $articleConcurrentRepository;
     private $articleVendeurRepository;    
+
+    private $manager;
     
     private const ETATS_CALCUL = [
         1 => 'Etat moyen',
@@ -34,13 +37,15 @@ class ConcurrentController extends AbstractController
                                 EtatRepository $etatRepository, 
                                 ConcurrentRepository $concurrentRepository,
                                 ArticleConcurrentRepository $articleConcurrentRepository,
-                                ArticleVendeurRepository $articleVendeurRepository) 
+                                ArticleVendeurRepository $articleVendeurRepository,
+                                ObjectManager $manager) 
     {
         $this->articleRepository = $articleRepository;
         $this->etatRepository = $etatRepository;
         $this->concurrentRepository = $concurrentRepository;
         $this->articleConcurrentRepository = $articleConcurrentRepository;
         $this->articleVendeurRepository = $articleVendeurRepository;
+        $this->manager = $manager;;
     }
 
     /**
@@ -48,7 +53,7 @@ class ConcurrentController extends AbstractController
      */
     public function index()
     {      
-        $all_concurrents = $this->concurrentRepository->findAll();
+        $all_concurrents = $this->concurrentRepository->findBy([], ['id' => 'DESC']);   
         
         return $this->render('concurrent/index.html.twig', [
             'all_concurrents' => $all_concurrents,
@@ -216,5 +221,34 @@ class ConcurrentController extends AbstractController
 
         // Si la requete n'est pas bonne
         return $this->redirect($this->generateUrl('articles_vendeur_list'));
+    }
+
+    /**
+     * @Route("/concurrents/update", name="concurrent_update")
+     */
+    public function update(Request $request)
+    {
+        // Infos concurrent 
+        $villeConcurrent = $request->get('villeConcurrent');
+        $telConcurrent = $request->get('telConcurrent');
+        $idConcurrent = $request->get('idConcurrent');        
+
+        $entity = $this->concurrentRepository->findOneBy(
+            ['id' => $idConcurrent]
+        );
+
+        // Update data
+        $entity->setVille($villeConcurrent);
+        $entity->setTel($telConcurrent);
+
+        // Suppression de l'entité de la base
+        $this->manager->persist($entity);
+        $this->manager->flush();
+
+        // Todo : Le prix a déjà été fixé pour cet article
+        $this->addFlash('success', 'Les informations du concurrent <b>'.$entity->getNom().'</b> ont été mises à jour.');        
+
+        // Si la requete n'est pas bonne
+        return $this->redirect($this->generateUrl('concurrents_list'));
     }
 }
