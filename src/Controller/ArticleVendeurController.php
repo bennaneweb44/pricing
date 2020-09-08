@@ -4,9 +4,9 @@ namespace App\Controller;
 
 use App\Repository\ArticleVendeurRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
-class DefaultController extends AbstractController
+class ArticleVendeurController extends AbstractController
 {
     private $articleVendeurRepository;
 
@@ -14,17 +14,17 @@ class DefaultController extends AbstractController
     {
         $this->articleVendeurRepository = $articleVendeurRepository;
     }
-    
-    public function index(): Response
-    {
-        if (!$this->getUser()) {
-            return $this->redirect($this->generateUrl('app_login'));
-        }
 
+    /**
+     * @Route("/articles/vendeur", name="articles_vendeur_list")
+     */
+    public function index()
+    {
         // Récupérer Tous les articles concurrencés
-        $articlesVendeurs = $this->articleVendeurRepository->findAll();
-        
-        return $this->render('default/index.html.twig', [
+        $articlesVendeurs = $this->articleVendeurRepository->findBy([], ['id' => 'DESC']);
+
+        return $this->render('articles_vendeur/index.html.twig', [
+            'controller_name' => 'ArticleVendeurController',
             'articlesVendeurs' => $articlesVendeurs
         ]);
     }

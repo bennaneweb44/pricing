@@ -14,21 +14,26 @@
 {% block body %}
     
     <div class="card-deck mb-12 text-center">
-
-        
-
-        <div class="card mb-4 box-shadow">
+    
+        <div class="card mb-4 box-shadow ">
             <div class="card-header">
                 <h4 class="my-0 font-weight-normal">Mis en concurrence</h4>
             </div>
-            <div class="card-body">                
+            <div class="card-body">
                 <ul class="list-unstyled mt-3 mb-4">
-                    <li>Article A</li>
-                    <li>Article B</li>
-                    <li>Article C</li>
-                    <li>Article D</li>
+                    {% if articlesVendeurs| length > 0 %}
+                        {% set compteur = 1 %}
+                        {% for articleVend in articlesVendeurs %}
+                            <li><b>{{ articleVend.article.libelle }}</b> positionné à <b>{{ articleVend.prix }} € </b>({{ articleVend.etat.intitule }})</li>
+                            {% set compteur = compteur + 1 %}
+                        {% endfor %}
+                    {% else %}
+                        <li>Aucune article concurrencé.</li>
+                    {% endif %}
                 </ul>
-                <button type="button" class="btn btn-lg btn-block btn-primary"><i class="fas fa-list"></i> Tous les articles</button>
+                <a type="button" id="bouttonAccueil" href="{{ path('articles_vendeur_list') }}" class="btn btn-lg btn-block btn-primary">
+                    <i class="fas fa-list"></i> Tous les articles
+                </a>
             </div>
         </div>
 
@@ -38,18 +43,27 @@
             </div>
             <div class="card-body">                
                 <ul class="list-unstyled mt-3 mb-4">
-                    <li>Offre 1</li>
-                    <li>Offre 2</li>
-                    <li>Offre 3</li>
-                    <li>Offre 4</li>
+                    <li>TODO : Offre 1</li>
+                    <li>TODO : Offre 2</li>
+                    <li>TODO : Offre 3</li>
+                    <li>TODO : Offre 4</li>
                 </ul>
                 <button type="button" class="btn btn-lg btn-block btn-primary"><i class="fas fa-list"></i> Toutes les offres</button>
             </div>
         </div>
+
     </div>
         
 {% endblock %}
 
-{% block javascripts %}{% endblock %}
+{% block javascripts %}
+    <style>
+        #bouttonAccueil {
+            position: absolute;
+            bottom: 15px;
+            width: 92%;
+        }
+    </style>
+{% endblock %}
 
 

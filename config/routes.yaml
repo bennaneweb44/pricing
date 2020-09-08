@@ -10,6 +10,10 @@ concurrents_list:
     path: /concurrents
     controller: App\Controller\ConcurrentController::index
 
+articles_vendeur_list:
+    path: /articles/vendeur
+    controller: App\Controller\ArticleVendeurController::index
+
 placer_concurrence_form:
     path: /article/{id}/concurrencer
     controller: App\Controller\ConcurrentController::placerForm

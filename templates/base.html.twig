@@ -16,8 +16,16 @@
         <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
             <h3 class="my-0 mr-md-auto font-weight-normal" ><i class="fa fa-coin"></i> <a href="{{ path('index') }}" style="color: #000">Pricing</a></h3>
             {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}                
+                <a class="p-2 text-dark mr-2" href="{{ path('index') }}"><i class="fas fa-home"></i> Accueil</a>  
                 <nav class="my-2 my-md-0 mr-md-3">
-                    <a class="p-2 text-dark" href="{{ path('articles_list') }}"><i class="fas fa-barcode"></i> Articles</a>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fas fa-barcode"></i> Articles
+                        <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu p-2">                        
+                        <a class="p-2 text-dark" href="{{ path('articles_list') }}">Non concurrencés</a> <br>
+                        <a class="p-2 text-dark" href="{{ path('articles_vendeur_list') }}">Concurrencés</a>
+                    </ul>
                     <a class="p-2 text-dark" href="{{ path('concurrents_list') }}"><i class="fas fa-users"></i> Concurrents</a>                    
                 </nav>
                 <a class="btn btn-outline-danger" href="{{ path('app_logout') }}"><i class="fa fa-sign-out"></i> Déconnexion</a>
@@ -46,12 +54,11 @@
                 </div>
 
                 <div class="col-6 col-md text-center">
-                    <h5>A propos</h5>
+                    <h5>BWV</h5>
                     <ul class="list-unstyled text-small">
-                        <li><a class="text-muted" href="#">BWV</a></li>
                         <li><a class="text-muted" href="#">Sainte-luce-sur-loire</a></li>
                         <li><a class="text-muted" href="#">Tél : 07.60.71.57.58</a></li>
-                        <li><a class="text-muted" href="mailto:bennnewaeb44@gmail.com">Email : bennaneweb44@gmail.com</a></li>
+                        <li><a class="text-muted" href="mailto:bennaneweb44@gmail.com">Email : bennaneweb44@gmail.com</a></li>
                     </ul>
                 </div>
                 </div>
@@ -69,5 +76,8 @@
 <style>
     a:hover {
         text-decoration: none;
+    }
+    .dropdown-toggle, .dropdown-toggle:hover {
+        color: #000;
     }
 </style>

@@ -4,7 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Etat;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query\Parameter;
 
 /**
  * @method Etat|null find($id, $lockMode = null, $lockVersion = null)
@@ -47,4 +49,31 @@ class EtatRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function findByIntitules($intitules)
+    {
+        $parameters = [];
+        $where = '';
+        $ind = 0;
+        foreach($intitules as $intitutle) {
+            $ind++;
+            $where .= 'a.intitule = :etat'.strval($ind);
+            $parameters[] = new Parameter('etat'.strval($ind) , $intitutle);
+
+            if ($ind < count($intitules)) {
+                $where .= ' OR ';
+            }
+        }
+
+        $req = $this->createQueryBuilder('a')
+            ->select()
+            ->where($where)
+            ->setParameters(new ArrayCollection($parameters))
+            ->orderBy('a.id', 'ASC')            
+            ->getQuery()
+            ->getResult()
+        ;
+        
+        return $req;
+    }
 }

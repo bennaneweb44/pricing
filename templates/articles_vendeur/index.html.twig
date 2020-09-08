@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Articles concurrencés - Pricing{% endblock %}
+
+{% block titlePage %}
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h2><i class="fas fa-barcode"></i> Articles concurrencés</h2>
+    </div>
+{% endblock %}
+
+{% block body %}
+
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 1200px; width: 95%; font: 16px/1.5 sans-serif; }
+    .badge { font-size: 15px }
+    .badge-default { background-color: #ddd }
+    .badge-inverse { background-color: #FC6AA8; color: whitesmoke }
+    #poubelle { font-size: 15px; color: red }
+</style>
+
+<div class="example-wrapper">
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            <i class="fa fa-check"></i> {{ message |raw }}
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('warning') %}
+        <div class="alert alert-warning">
+            <i class="fa fa-exclamation-triangle"></i> {{ message |raw }}
+        </div>        
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            <i class="fa fa-times-circle"></i> {{ message |raw }}
+        </div>
+    {% endfor %}
+    
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Référence</th>
+                <th>Libellé</th>
+                <th>Etat</th>
+                <th>Prix plancher</th>
+                <th>Prix</th>
+                <th>Action</h>
+            </tr>
+        </thead>
+        <tbody>
+            {% if articlesVendeurs| length > 0 %}
+                {% set compteur = 1 %}
+                {% for articleVend in articlesVendeurs %}
+
+                    {% set couleurBadge = '' %}
+                    
+                    {% if articleVend.etat.intitule == 'Etat moyen' %}
+                        {% set couleurBadge = 'badge-default' %}        
+                    {% elseif articleVend.etat.intitule == 'Bon état' %}
+                        {% set couleurBadge = 'badge-warning' %}
+                    {% elseif articleVend.etat.intitule == 'Très bon état' %}
+                        {% set couleurBadge = 'badge-success' %}
+                    {% elseif articleVend.etat.intitule == 'Comme neuf' %}        
+                        {% set couleurBadge = 'badge-info' %}
+                    {% elseif articleVend.etat.intitule == 'Neuf' %}        
+                        {% set couleurBadge = 'badge-inverse' %}
+                    {% endif %}
+
+                    <tr>
+                        <th scope="row">{{ compteur }}</th>
+                        <td>{{ articleVend.article.reference }}</td>
+                        <td>{{ articleVend.article.libelle }}</td>
+                        <td><span class="badge {{ couleurBadge }}">{{ articleVend.etat.intitule }}</span></td>
+                        <td>{{ articleVend.plancher }} €</td>
+                        <td><b>{{ articleVend.prix }} €</b></td>
+                        <td>
+                            <a href="" title="Supprimer">
+                                <i class="fas fa-trash-alt" id="poubelle"></i>                            
+                            </a>
+                        </td>
+                    </tr>
+                    {% set compteur = compteur + 1 %}
+                {% endfor %}    
+            {% else %}
+                <tr class="text-center">
+                    <td colspan="3" class="pt-5">Aucune article concurrencé.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+
+</div>
+{% endblock %}

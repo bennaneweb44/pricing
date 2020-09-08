@@ -4,7 +4,9 @@ namespace App\Repository;
 
 use App\Entity\ArticleConcurrent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query\Parameter;
 
 /**
  * @method ArticleConcurrent|null find($id, $lockMode = null, $lockVersion = null)
@@ -47,4 +49,31 @@ class ArticleConcurrentRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function getArticlesConcurrentsWithEtats($etats)
+    {
+        $parameters = [];
+        $where = '';
+        $ind = 0;
+        foreach($etats as $etat) {
+            $ind++;
+            $where .= 'a.etat = :etat'.strval($ind);
+            $parameters[] = new Parameter('etat'.strval($ind) , $etat);
+
+            if ($ind < count($etats)) {
+                $where .= ' OR ';
+            }
+        }
+
+        $req = $this->createQueryBuilder('a')
+            ->select()
+            ->where($where)
+            ->setParameters(new ArrayCollection($parameters))
+            ->orderBy('a.prix', 'ASC')            
+            ->getQuery()
+            ->getResult()
+        ;
+
+        return $req;
+    }
 }

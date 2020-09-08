@@ -98,33 +98,26 @@ class ConcurrentController extends AbstractController
             }
         }
 
-        /////////////////////// Concurrents avec MEILLEUR état /////////////////////
+        /////////////////////// Concurrents avec MEILLEURS états ///////////////////
         $prixMeilleurEtat = [];
 
-        $intituleEtat = '';          
+        $intituleEtat = [];          
         $indice = 0;
         foreach(self::ETATS_CALCUL as $cle => $valeur) {
             if ($valeur == $etatForm) {
-                $indice = $cle;
+                $indice = $cle;                
             } elseif ($indice > 0) {
-                $intituleEtat = $valeur;
-                break;
+                $intituleEtat[] = $valeur;
             }
         }
 
-        // Get Etat
-        $etatMeilleur = $this->etatRepository->findOneBy(
-            ['intitule' => $intituleEtat]
-        );
+        // Get Etats
+        $etats = $this->etatRepository->findByIntitules($intituleEtat);
 
-        $articlesMemeEtat = $this->articleConcurrentRepository->findBy(
-            [ 'etat' => $etatMeilleur]
-        );
+        $articlesEtatsDifferents = $this->articleConcurrentRepository->getArticlesConcurrentsWithEtats($etats);
 
-        foreach($articlesMemeEtat as $ac) {
-            if (!in_array($ac->getPrix(), $prixMeilleurEtat)) {
-                $prixMeilleurEtat[] = $ac->getPrix();
-            }
+        foreach($articlesEtatsDifferents as $ac) {
+            $prixMeilleurEtat[$ac->getEtat()->getIntitule()][] = $ac->getPrix();
         }
 
         // Vérifier que le prix de l'article n'a pas été fixé auparavent pour cet état         
@@ -136,11 +129,12 @@ class ConcurrentController extends AbstractController
 
             // Service 
             $venderuService  = new VendeurService($this->getDoctrine()->getManager());
+
             $prix_de_vente = $venderuService->calculerPrix($article, $etat, $prixPlancher, $prixMemeEtat, $prixMeilleurEtat);
 
             if ($prix_de_vente == 0) {
                 // Todo : Envoyer message NEGATIF à la vue
-                $this->addFlash('warning', 'Le prix n\'a pu être fixé pour cet article car il dépasse le prix plancher !');
+                $this->addFlash('warning', 'Le prix n\'a pu être fixé pour cet article. Veuillez vérifier votre prix plancher !');
             } else {
                 // Todo : Envoyer message POSITIF à la vue
                 $this->addFlash('success', 'L\'article dont l\'état est <b>'.$etatForm.'</b> a été positionné au prix de <b>'.$prix_de_vente.' €</b>.');
@@ -152,6 +146,6 @@ class ConcurrentController extends AbstractController
         }
 
         // Si la requete n'est pas bonne
-        return $this->redirect($this->generateUrl('articles_list'));
+        return $this->redirect($this->generateUrl('articles_vendeur_list'));
     }
 }

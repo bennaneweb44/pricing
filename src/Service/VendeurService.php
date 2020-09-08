@@ -36,24 +36,33 @@ class VendeurService
     public function calculerPrix(Article $article, Etat $etat, $prixPlancher, $prixMemeEtat = [], $prixEtatSuperieur = []) 
     {
         $prixDeVente = 0;
+        $prixPlancher = floatval($prixPlancher);
 
-        // Tri des tableaux des prix pour viser le moins cher des concurrents                
+        // Tri des tableaux des prix pour viser le moins cher des concurrents 
         sort($prixMemeEtat);
-        sort($prixEtatSuperieur);
 
-        foreach($prixMemeEtat as $prix_m) {
-            if ($prixPlancher <= floatval($prix_m) - 0.01 ) {                
-                $prixDeVente = floatval($prix_m) - 0.01;
+        foreach($prixMemeEtat as $prix_m) {            
+            $prix_m = floatval($prix_m) - 0.01;            
+            if (abs(($prixPlancher - $prix_m) / $prix_m) < 0.00001 || $prixPlancher < $prix_m) {
+                $prixDeVente = $prix_m;
                 break;
-            }   
-        }        
+            }
+        }    
         
         if ($prixDeVente == 0) {
-            foreach($prixEtatSuperieur as $prix_s) {
-                if ($prixPlancher <= floatval($prix_s) - 1) {
-                    $prixDeVente = floatval($prix_s) - 1;
+            foreach($prixEtatSuperieur as $prix_by_etat) {
+                
+                foreach($prix_by_etat as $prix_s) {
+                    $prix_s = floatval($prix_s) - 1;            
+                    if (abs(($prixPlancher - $prix_s) / $prix_s) < 0.00001 || $prixPlancher < $prix_s) {
+                        $prixDeVente = $prix_s;
+                        break;
+                    }
+                }
+
+                if ($prixDeVente > 0) {
                     break;
-                }   
+                }
             }
         }
 
