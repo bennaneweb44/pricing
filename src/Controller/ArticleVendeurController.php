@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\ArticleVendeurRepository;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\ORMException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -46,8 +47,12 @@ class ArticleVendeurController extends AbstractController
         );
 
         // Suppression de l'entité de la base
-        $this->manager->remove($entity);
-        $this->manager->flush();
+        try {
+            $this->manager->remove($entity);
+            $this->manager->flush();
+        } catch(ORMException $ex) {
+            
+        }
 
         // Todo : Le prix a déjà été fixé pour cet article
         $this->addFlash('error', 'Prix de concurrence supprmé pour cet article.');        

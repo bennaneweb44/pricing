@@ -9,6 +9,7 @@ use App\Repository\ConcurrentRepository;
 use App\Repository\EtatRepository;
 use App\Service\VendeurService;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\ORMException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -249,9 +250,13 @@ class ConcurrentController extends AbstractController
         $entity->setVille($villeConcurrent);
         $entity->setTel($telConcurrent);
 
-        // Suppression de l'entité de la base
-        $this->manager->persist($entity);
-        $this->manager->flush();
+        // Update de l'entité 
+        try {
+            $this->manager->persist($entity);
+            $this->manager->flush();
+        } catch(ORMException $ex) {
+            
+        }
 
         // Todo : Le prix a déjà été fixé pour cet article
         $this->addFlash('success', 'Les informations du concurrent <b>'.$entity->getNom().'</b> ont été mises à jour.');        
