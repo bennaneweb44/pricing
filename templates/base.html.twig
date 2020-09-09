@@ -39,7 +39,9 @@
                         <b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu p-2">                        
-                        <a class="p-2 text-dark" href="{{ path('concurrents_list_etat_get', {'etat' : 1}) }}">Meilleurs offres</a> <br>
+                        {% if id_article_default is defined %}
+                            <a class="p-2 text-dark" href="{{ path('concurrents_list_etat_get', {'id_etat' : 1, 'id_article' : id_article_default}) }}">Meilleurs offres</a> <br>
+                        {% endif %}
                         <a class="p-2 text-dark" href="{{ path('concurrents_list') }}">Tous</a>
                     </ul>
                 </nav>

@@ -16,7 +16,7 @@ concurrent_update:
     methods: POST
 
 concurrents_list_etat_get:
-    path: /concurrents/{etat}
+    path: /offres/article/{id_article}/etat/{id_etat}
     controller: App\Controller\ConcurrentController::indexEtatGet
     methods: GET
 

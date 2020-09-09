@@ -50,10 +50,10 @@ class ArticleConcurrentRepository extends ServiceEntityRepository
     }
     */
 
-    public function getArticlesConcurrentsWithEtats($etats)
+    public function getArticlesConcurrentsWithEtats($etats, $article)
     {
         $parameters = [];
-        $where = '';
+        $where = '(';
         $ind = 0;
         foreach($etats as $etat) {
             $ind++;
@@ -64,6 +64,12 @@ class ArticleConcurrentRepository extends ServiceEntityRepository
                 $where .= ' OR ';
             }
         }
+
+        $where .= ')';
+
+        // Article
+        $where .= ' AND (a.article = :article)';
+        $parameters[] = new Parameter('article', $article);
 
         $req = $this->createQueryBuilder('a')
             ->select()

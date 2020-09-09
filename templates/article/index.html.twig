@@ -11,13 +11,13 @@
 {% block body %}
 
 <style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper { margin: 1em auto; max-width: 1100px; width: 95%; font: 18px/1.5 sans-serif; }
     table { min-height: 250px }    
 </style>
 
 <div class="example-wrapper">
     
-    <table class="table">
+    <table class="table table-sm table-hover">
         <thead>
             <tr>
                 <th scope="col">#</th>
@@ -35,7 +35,7 @@
                         <td>{{ article.reference }}</td>
                         <td>{{ article.libelle }}</td>
                         <th>
-                            {% if article.concurrence == 0 %}                                
+                            {% if 1 == 0 %}                                
                                 <i class="fas fa-rocket" style="font-size: 20px; color:#ccc"></i>                                                            
                             {% else %}
                                 <a href="{{ path('placer_concurrence_form', {'id' : article.id, 'etatSelectionne' : 1 }) }}" title="Concurrencer">

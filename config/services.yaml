@@ -29,3 +29,7 @@ services:
     vendeur_service:
         class:  App\Service\VendeurService
         arguments: []
+
+    App\EventListener\ControllerListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller }

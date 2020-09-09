@@ -31,8 +31,6 @@ class ConcurrentController extends AbstractController
         5 => 'Neuf'
     ];
 
-    private const REF_ARTICLE_EXEMPLE = 'JVD-105057';
-
     public function __construct(ArticleRepository $articleRepository,
                                 EtatRepository $etatRepository, 
                                 ConcurrentRepository $concurrentRepository,
@@ -62,23 +60,25 @@ class ConcurrentController extends AbstractController
 
 
     /**
-     * @Route("/concurrents/{etat}", name="concurrents_list_etat_get")
+     * @Route("/offres/article/{id_article}/etat/{id_etat}", name="concurrents_list_etat_get")
      */
-    public function indexEtatGet($etat)
+    public function indexEtatGet($id_article, $id_etat)
     {
-        $int_ids = array_keys(self::ETATS_CALCUL);
-        if (!in_array($etat, $int_ids)) {
+        $idsEtats = array_keys(self::ETATS_CALCUL);
+        if (!in_array($id_etat, $idsEtats) || !is_numeric($id_article) ) {
             $this->addFlash('danger', 'Oups, l\'adresse demandée n\'est pas correcte !');            
             return $this->redirect($this->generateUrl('index'));
         }
 
-        // Article (défaut)
-        $article = $this->articleRepository->findOneBy(
-            ['reference' => self::REF_ARTICLE_EXEMPLE]
-        );
+        // Article
+        $article = $this->articleRepository->find($id_article);
 
-        // Etat (défaut)
-        $etatSelectionne = self::ETATS_CALCUL[$etat];
+        // Articles
+        $articles = $this->articleRepository->findAll();
+
+
+        // Etat
+        $etatSelectionne = self::ETATS_CALCUL[$id_etat];
         $etatObjet = $this->etatRepository->findBy(
             ['intitule' => $etatSelectionne]
         );
@@ -86,7 +86,7 @@ class ConcurrentController extends AbstractController
         // Tous les états
         $tous_etats = $this->etatRepository->findAll();
 
-        // Concurrents pour cet Article et cet Etat (prix : asc)
+        // Concurrents pour cet Article et cet Etat (prix asc : meilleure offre)
         $concurrentsArticleEtat = $this->articleConcurrentRepository->findBy([
             'etat' => $etatObjet,
             'article' => $article
@@ -96,8 +96,9 @@ class ConcurrentController extends AbstractController
 
         return $this->render('concurrent/meilleurs_offres.html.twig', [
             'concurrentsArticleEtat' => $concurrentsArticleEtat,
+            'tous_articles' => $articles,
             'article' => $article,
-            'etatSelectionne' => $etat,
+            'etatSelectionne' => $id_etat,
             'tous_etats' => $tous_etats,
             'etats_fixes' => self::ETATS_CALCUL
         ]);
@@ -111,7 +112,8 @@ class ConcurrentController extends AbstractController
     public function indexEtatPost(Request $request)
     {
         $id_etat = $request->get('etatChoisi');
-        return $this->redirect($this->generateUrl('concurrents_list_etat_get', ['etat' => $id_etat ] ));
+        $id_article = $request->get('articleChoisi');
+        return $this->redirect($this->generateUrl('concurrents_list_etat_get', ['id_etat' => $id_etat, 'id_article' => $id_article] ));
     }
 
     /**
@@ -162,7 +164,10 @@ class ConcurrentController extends AbstractController
 
         ///////////////////////// Concurrents du MEME état /////////////////////////
         $articlesMemeEtat = $this->articleConcurrentRepository->findBy(
-            [ 'etat' => $etat]
+            [
+                'etat' => $etat,
+                'article' => $article
+            ]
         );
 
         $prixMemeEtat = [];
@@ -188,7 +193,7 @@ class ConcurrentController extends AbstractController
         // Etats supérieurs existent ( <> 'Neuf' )
         if (count($intituleEtat)) {        
             $etats = $this->etatRepository->findByIntitules($intituleEtat);            
-            $articlesEtatsDifferents = $this->articleConcurrentRepository->getArticlesConcurrentsWithEtats($etats);
+            $articlesEtatsDifferents = $this->articleConcurrentRepository->getArticlesConcurrentsWithEtats($etats, $article);
             foreach($articlesEtatsDifferents as $ac) {
                 $prixMeilleurEtat[$ac->getEtat()->getIntitule()][] = $ac->getPrix();
             }
@@ -201,21 +206,24 @@ class ConcurrentController extends AbstractController
 
         if (!$articleAvecPrix) {
 
-            // Service 
-            $venderuService  = new VendeurService($this->getDoctrine()->getManager());
-
-            $prix_de_vente = $venderuService->calculerPrix($article, $etat, $prixPlancher, $prixMemeEtat, $prixMeilleurEtat);
-
-            if ($prix_de_vente == 0) {
-                // Todo : Envoyer message NEGATIF à la vue
-                $this->addFlash('warning', 'Le prix n\'a pu être fixé pour cet article. Veuillez vérifier votre prix plancher !');
+            // Si le prix du produit n'existe pas chez le concurrent dans aucun état
+            if (!count($prixMemeEtat) && !count($prixMeilleurEtat)) {
+                $this->addFlash('warning', 'Impossible de placer un prix pour cet article, car aucun concurrent ne l\'a fait auparavant !');
             } else {
-                // Todo : Envoyer message POSITIF à la vue
-                $this->addFlash('success', 'L\'article <b>'.$article->getLibelle().'</b> dont l\'état est <b>'.$etatForm.'</b> a été positionné au prix de <b>'.$prix_de_vente.' €</b>.');
+
+                // Service 
+                $venderuService  = new VendeurService($this->getDoctrine()->getManager());
+
+                $prix_de_vente = $venderuService->calculerPrix($article, $etat, $prixPlancher, $prixMemeEtat, $prixMeilleurEtat);
+
+                if ($prix_de_vente == 0) {
+                    $this->addFlash('warning', 'Le prix n\'a pu être fixé pour cet article. Veuillez vérifier votre prix plancher !');
+                } else {
+                    $this->addFlash('success', 'L\'article <b>'.$article->getLibelle().'</b> dont l\'état est <b>'.$etatForm.'</b> a été positionné au prix de <b>'.number_format($prix_de_vente, 2).' €</b>.');
+                }
             }
 
         } else {
-            // Todo : Le prix a déjà été fixé pour cet article
             $this->addFlash('warning', 'Attention, le prix a déjà été fixé pour cet article avec cet état.');
         }
 

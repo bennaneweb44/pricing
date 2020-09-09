@@ -35,7 +35,7 @@ class ArticleFixture extends Fixture
             ],
             [
                 'ref' => 'LVR-090477',
-                'title' => 'La Bible de Jérusalem'
+                'title' => 'Astérix Vol-38'
             ],
             [
                 'ref' => 'PCP-511052',
@@ -149,15 +149,23 @@ class ArticleFixture extends Fixture
             $manager->persist($article);     
             $manager->flush();  
 
-            if ($element['ref'] === 'JVD-105057') {
-                $this->articleExemple = clone $article;                                                
-                $this->setReference('Article', $article);
-            }
-        }
-
-        // Nous devons absolument avoir un article d'exemple
-        if ($this->articleExemple instanceof Article == FALSE) {
-            exit('Erreur : L\'article d\'exemple n\'est pas valorisé !');
+            switch ($element['ref']) {
+                case 'JVD-105057' :
+                    $this->setReference('Article_1', $article);
+                    break;
+                case 'LVR-090477' :
+                    $this->setReference('Article_2', $article);
+                    break;
+                case 'PCP-511052' :
+                    $this->setReference('Article_3', $article);
+                    break;
+                case 'PZL-009895' :
+                    $this->setReference('Article_4', $article);
+                    break;
+                case 'JCT-119740' :
+                    $this->setReference('Article_5', $article);
+                    break;
+            } 
         }
 
         foreach($this->etats as $state) {            
@@ -185,13 +193,48 @@ class ArticleFixture extends Fixture
                     // Prix d'exemple
                     $prixExemple = $this->articlesConcurrents[$concurrent->getNom()]['prix'];
 
-                    // ArticleConcurrent
+                    // ArticleConcurrent 1
                     $articleConcurrent = new ArticleConcurrent();
-                    $articleConcurrent->setArticle($this->getReference('Article'));
+                    $articleConcurrent->setArticle($this->getReference('Article_1'));
                     $articleConcurrent->setConcurrent($this->getReference('Concurrent'));
                     $articleConcurrent->setPrix($prixExemple);
                     $articleConcurrent->setEtat($this->getReference('Etat'));
+                    $manager->persist($articleConcurrent); 
+                    $manager->flush();
 
+                    // ArticleConcurrent 2
+                    $articleConcurrent = new ArticleConcurrent();
+                    $articleConcurrent->setArticle($this->getReference('Article_2'));
+                    $articleConcurrent->setConcurrent($this->getReference('Concurrent'));
+                    $articleConcurrent->setPrix($prixExemple + 0.78);
+                    $articleConcurrent->setEtat($this->getReference('Etat'));
+                    $manager->persist($articleConcurrent); 
+                    $manager->flush();
+
+                    // ArticleConcurrent 3
+                    $articleConcurrent = new ArticleConcurrent();
+                    $articleConcurrent->setArticle($this->getReference('Article_3'));
+                    $articleConcurrent->setConcurrent($this->getReference('Concurrent'));
+                    $articleConcurrent->setPrix($prixExemple + 0.18);
+                    $articleConcurrent->setEtat($this->getReference('Etat'));
+                    $manager->persist($articleConcurrent); 
+                    $manager->flush();
+
+                    // ArticleConcurrent 4
+                    $articleConcurrent = new ArticleConcurrent();
+                    $articleConcurrent->setArticle($this->getReference('Article_4'));
+                    $articleConcurrent->setConcurrent($this->getReference('Concurrent'));
+                    $articleConcurrent->setPrix($prixExemple + 0.21);
+                    $articleConcurrent->setEtat($this->getReference('Etat'));
+                    $manager->persist($articleConcurrent); 
+                    $manager->flush();
+
+                    // ArticleConcurrent 5
+                    $articleConcurrent = new ArticleConcurrent();
+                    $articleConcurrent->setArticle($this->getReference('Article_5'));
+                    $articleConcurrent->setConcurrent($this->getReference('Concurrent'));
+                    $articleConcurrent->setPrix($prixExemple + 0.35);
+                    $articleConcurrent->setEtat($this->getReference('Etat'));
                     $manager->persist($articleConcurrent); 
                     $manager->flush();
                 }          
